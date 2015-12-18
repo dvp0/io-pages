@@ -1,0 +1,189 @@
+<html>
+	<head>
+		<title>Travelling Salesman 2-Approximation</title>
+	</head>
+	<script src="jquery.js"></script>
+	<script src="utilities.js"></script>
+	<script src="graph.js"></script>
+	<script src="mst.js"></script>
+	<script src="tour.js"></script>
+	<link href="boot.css" rel="stylesheet">
+	<script>
+		var counter = 0;
+		var nodeNumber = 0;
+
+		var countUp = function () {
+			counter++;
+		};
+
+		var showCount = function (message) {
+			$("#results").append('n ' + nodeNumber + ') ' + message + ' <steps : ' +counter+'><br/>');
+		}
+
+		var removedNodes = [];
+
+		var graph 		= null,
+			mst 		= null,
+			tour 		= null,
+			ctx			= null,
+			waitForMST 	= null,
+			cancel 		= false;
+
+		$(document).ready(function() {
+			ctx = $("#canvas")[0].getContext("2d");
+			disableButtons();
+
+			$("#new-button").attr("disabled", false);
+
+			//Create new graph then run MST and Tour
+			$("#new-button").click(function(){
+				nodeNumber = 0;
+				counter = 0;
+				$("#results").empty();
+
+				var numNodes = parseInt($("#nodes-input").val());
+
+				if(isNaN(numNodes) || numNodes <= 1) {
+					alert("You need atleast 2 nodes to run the algorithm.");
+					return;
+				}
+
+				graph = new Graph(ctx, numNodes);
+
+				doAlgorithm();
+			});
+
+//			Run the algorithm using the same graph
+			$("#again-button").click(function(){
+				nodeNumber = 0;
+				graph.again();
+//				doAlgorithm();
+				$('#results').empty();
+			});
+
+			function doAlgorithm() {
+				var time = parseInt($("#time-input").val());
+
+				if(isNaN(time) || time < 1) {
+					alert("You need to set the time to be over 0ms to run the algorithm.");
+					return;
+				}
+
+				mst  	= null;
+				tour 	= null;
+				cancel 	= false;
+
+				disableButtons();
+				$("#cancel-button").attr("disabled", false);
+
+				mst 		= new MST(graph, time);
+				waitForMST 	= setInterval(function(){
+					if(mst && mst.done && !cancel) {
+						clearInterval(waitForMST);
+						tour = new Tour(graph, time);
+					}
+				}, 1000);
+			}
+
+//			$("#tour-button").click(function() {
+//				if(graph) {
+//					graph.clear();
+//					graph.drawTourEdges("#FF0000");
+//					graph.drawNodes();
+//				}
+//			});
+//
+//			$("#mst-button").click(function() {
+//				if(graph) {
+//					graph.clear();
+//					graph.drawEdges();
+//					graph.drawNodes();
+//				}
+//			});
+//
+//			$("#both-button").click(function() {
+//				if(graph)
+//					graph.draw();
+//			});
+//
+//			$("#cancel-button").click(function() {
+//				cancel = true;
+//				if(mst)
+//					mst.done = true;
+//				if(tour)
+//					tour.done = true;
+//				enableButtons();
+//				clearInterval(waitForMST);
+//				waitForMST = null;
+//			});
+//
+//			$("#full-button").click(function() {
+//				if(graph && (!mst || mst.done) && (!tour || tour.done)) {
+//					graph.drawFullGraph();
+//				}
+//			});
+
+			setInterval(function() {
+				if(tour && tour.done) {
+					enableButtons();
+				}
+			}, 100);
+
+			function disableButtons() {
+				$("#new-button").attr("disabled", true);
+				$("#both-button").attr("disabled", true);
+				$("#mst-button").attr("disabled", true);
+				$("#tour-button").attr("disabled", true);
+				$("#again-button").attr("disabled", true);
+				$("#cancel-button").attr("disabled", true);
+				$("#full-button").attr("disabled", true);
+			}
+
+			function enableButtons() {
+				$("#new-button").attr("disabled", false);
+				$("#both-button").attr("disabled", false);
+				$("#mst-button").attr("disabled", false);
+				$("#tour-button").attr("disabled", false);
+				$("#again-button").attr("disabled", false);
+				$("#cancel-button").attr("disabled", false);
+				$("#full-button").attr("disabled", false);
+			}
+		});
+		
+		console.log("No syntax errors!");
+	</script>
+	<body style="padding: 0px; margin: 0px;">
+		<div class="well">
+			<div style="">
+				Amount of nodes:<br/>
+			</div>
+			<div style="float:left; margin-left: 5px;">
+				<input id="nodes-input" type="text" value="5">(recommend < 10000)<br/>
+				<input id="time-input" type="text" value="500">milliseconds<br/>
+			</div>
+			<br/>
+			<br/>
+			<br/>
+			<button  class="btn btn-primary" id="new-button">Process</button>
+			<button id="again-button" class="btn  btn-link btn-danger" disabled>Clear</button>
+			<!--<button id="cancel-button">Cancel</button>-->
+			<!--<br/>-->
+			<!--<button id="tour-button" disabled>Show tour path</button>-->
+			<!--<button id="mst-button" disabled>Show MST path</button>-->
+			<!--<button id="both-button" disabled>Show both</button>-->
+			<!--<button id="full-button" disabled>Show full graph</button>-->
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<canvas style="background-color: #FFF; margin-left:30px;" id="canvas" width="auto" height="500px">
+					<h1>You need a browser that supports the HTML5 canvas element to view this.</h1>
+				</canvas>
+			</div>
+			<div class="col-sm-6">
+				<div id="results">
+
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
