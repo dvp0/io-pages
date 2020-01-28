@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body {
+        font-family: Arial;
+        margin: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .btn {
+        display: block;
+        margin: 1rem;
+        padding: 1rem;
+        background: blue;
+        border: 0.5rem solid transparent;
+        color: white;
+      }
+
+      .btn:focus {
+        background: red;
+        border: 0.5rem solid pink;
+      }
+
+      .focuscontainer {
+        text-align: center;
+      }
+
+      .captions {
+        display: inline-block;
+      }
+
+      .console {
+        background: #ddd;
+        margin: 1rem;
+        padding: 1rem;
+      }
+
+    </style>
+  </head>
+  <div>
+
+    <div class="focuscontainer">
+      <div class="btn seekbar" tabindex="0">Seek bar</div>
+      <div class="btn captions" tabindex="0">CC</div>
+    </div>
+
+    <div class="console"></div>
+
+    <script type="text/javascript" src="index.js"></script>
+  </div>
+</html>
